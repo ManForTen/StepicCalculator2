@@ -7,13 +7,13 @@ import java.util.Arrays;
 class Main {
     public static void main(String[] args ) throws IOException {
         String s="";
-        File file = new File("test.txt");
+        File file = new File("input.txt");
         file.createNewFile();
         FileWriter writer = new FileWriter(file);
         writer.write("10 + 5");
         writer.flush();
         writer.close();
-        try(FileReader reader = new FileReader("test.txt"))
+        try(FileReader reader = new FileReader("input.txt"))
         {
             int c;
             while((c=reader.read())!=-1){
