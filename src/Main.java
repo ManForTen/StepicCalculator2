@@ -3,56 +3,64 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-class Main {
-    public static void main(String[] args ) throws IOException {
-        String s="";
-        File file = new File("input.txt");
-        file.createNewFile();
-        FileWriter writer = new FileWriter(file);
-        writer.write("10 + 5");
-        writer.flush();
-        writer.close();
-        try(FileReader reader = new FileReader("input.txt"))
-        {
+public class Main {
+    public static void main(String[] args) throws IOException {
+        String s = "";
+        File inputFile = new File("input.txt");
+        inputFile.createNewFile();
+        FileWriter writerInput = new FileWriter(inputFile);
+        writerInput.write("15 + 15\n25.3 * 3\nf / 0\n29.9 / 0\n157.8 - 93\n3 / 1\n3659.19 % 74.0001");
+        writerInput.flush();
+        writerInput.close();
+        try (FileReader reader = new FileReader("input.txt")) {
             int c;
-            while((c=reader.read())!=-1){
-                s+=(char)c;
+            while ((c = reader.read()) != -1) {
+                s += (char) c;
             }
-        }
-        catch(IOException ex){
+        } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
-        Object[] m = Arrays.stream(s.split(" ")).toArray(); // Загоняем значения в массив
-        Double a,b;
-
-        try { // Через обработку исключений вычисляем а и в
-            a = Double.valueOf(String.valueOf(m[0]));
-        } catch (NumberFormatException e) {
-            System.out.println("Error! Not number");
-            return;
+        File outputFile = new File("output.txt");
+        outputFile.createNewFile();
+        FileWriter writerOutput = new FileWriter(outputFile);
+        List<String> mTemp = Arrays.stream(s.split("\n")).collect(Collectors.toList()); // Загоняем значения по строчке в массив
+        for (int i = 0; i < mTemp.size(); i++) {
+            Object[] m = Arrays.stream(mTemp.get(i).split(" ")).toArray(); // Разбираем строку
+            writerOutput.write(mTemp.get(i)+" = "); // Записываем исходные данные
+            Double a, b;
+            try {
+                a = Double.valueOf(String.valueOf(m[0]));
+            } catch (NumberFormatException e) {
+                writerOutput.write("Error! Not number\n");
+                continue;
+            }
+            try {
+                b = Double.valueOf(String.valueOf(m[2]));
+            } catch (NumberFormatException e) {
+                writerOutput.write("Error! Not number\n");
+                continue;
+            }
+            switch (String.valueOf(m[1])) { // Обрабатываем знак операции, кроме деления
+                case "+":
+                    writerOutput.write((a + b)+"\n");
+                    break;
+                case "-":
+                    writerOutput.write((a - b)+"\n");
+                    break;
+                case "*":
+                    writerOutput.write((a * b)+"\n");
+                    break;
+                case "/":
+                    writerOutput.write(b != 0 ? a / b +"\n": "Error! Division by zero\n");
+                    break;
+                default:
+                    writerOutput.write("Operation Error!\n");
+            }
         }
-        try {
-            b = Double.valueOf(String.valueOf(m[2]));
-        } catch (NumberFormatException e) {
-            System.out.println("Error! Not number");
-            return;
-        }
-        switch (String.valueOf(m[1])) { // Обрабатываем знак операции, кроме деления
-            case "+":
-                System.out.println(a + b);
-                break;
-            case "-":
-                System.out.println(a - b);
-                break;
-            case "*":
-                System.out.println(a * b);
-                break;
-            case "/":
-                System.out.println(b != 0 ? a / b:"Error!");
-                break;
-            default:
-                System.out.println("Operation Error!");
-        }
+        writerOutput.flush();
+        writerOutput.close();
     }
 }
